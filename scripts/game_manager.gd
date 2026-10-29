@@ -64,7 +64,10 @@ func _request_play(card_index: int, target_pair: int) -> void:
 		_handle_play(multiplayer.get_remote_sender_id(), card_index, target_pair)
 
 func _handle_play(sender: int, card_index: int, target_pair: int) -> void:
-	if not game_started or round_finished or sender != current_attacker:
+	if not game_started or round_finished:
+		return
+	var can_defend := sender == defender and _has_uncovered_pair()
+	if sender != current_attacker and not can_defend:
 		return
 	var hand: Array = hands.get(sender, [])
 	if card_index < 0 or card_index >= hand.size():
@@ -169,6 +172,12 @@ func _beats(card: Dictionary, target: Dictionary) -> bool:
 	if int(card.suit) == int(target.suit):
 		return int(card.rank) > int(target.rank)
 	return int(card.suit) == trump_suit and int(target.suit) != trump_suit
+
+func _has_uncovered_pair() -> bool:
+	for pair in table_pairs:
+		if (pair.defense as Dictionary).is_empty():
+			return true
+	return false
 
 func _rank_on_table(rank: int) -> bool:
 	for pair in table_pairs:
