@@ -24,7 +24,8 @@ func _ready() -> void:
 	discovery = DISCOVERY_SCRIPT.new()
 	discovery.name = "LanDiscovery"
 	add_child(discovery)
-	discovery.rooms_changed.connect(_on_rooms_changed)
+	discovery.rooms_updated.connect(_on_rooms_changed)
+	discovery.start_search()
 	network = NETWORK_SCRIPT.new()
 	network.name = "NetworkManager"
 	add_child(network)
@@ -114,7 +115,7 @@ func _show_room() -> void:
 	var leave_btn := Button.new()
 	leave_btn.text = "Выйти в меню"
 	leave_btn.pressed.connect(func():
-		discovery.set_hosting(false)
+		discovery.stop_advertising()
 		network.disconnect_network()
 		_show_lobby()
 	)
@@ -187,7 +188,7 @@ func _show_table() -> void:
 func _on_host_pressed() -> void:
 	var err := network.create_room(name_input.text)
 	if err == OK:
-		discovery.set_hosting(true, "Дурак LAN", NETWORK_SCRIPT.GAME_PORT)
+		discovery.advertise_room("Дурак LAN", "room-%d" % get_instance_id(), NETWORK_SCRIPT.GAME_PORT)
 		_show_room()
 
 func _on_rooms_changed(rooms: Array[Dictionary]) -> void:
@@ -223,7 +224,7 @@ func _on_peers_changed(ids: Array[int]) -> void:
 			names.append(str(network.peer_names.get(id, "Игрок %d" % id)))
 		players_label.text = "Игроков: %d/4\n%s" % [ids.size(), ", ".join(names)]
 	if network.is_host and discovery:
-		discovery.set_hosting(true, "Дурак LAN", NETWORK_SCRIPT.GAME_PORT)
+		discovery.advertise_room("Дурак LAN", "room-%d" % get_instance_id(), NETWORK_SCRIPT.GAME_PORT)
 
 func _on_hand_changed(cards: Array) -> void:
 	local_hand = cards.duplicate(true)
