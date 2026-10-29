@@ -2,7 +2,7 @@ extends Node
 class_name GameManager
 
 signal state_changed(state: Dictionary)
-signal private_hand_changed(cards: Array[Dictionary])
+signal private_hand_changed(cards: Array)
 signal notice_changed(message: String)
 
 const SUITS := ["♣", "♦", "♥", "♠"]
