@@ -170,6 +170,16 @@ func _show_table() -> void:
 	beat_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	beat_btn.pressed.connect(func(): game.request_beat())
 	actions.add_child(beat_btn)
+	var transfer_btn := Button.new()
+	transfer_btn.text = "Перевести"
+	transfer_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	transfer_btn.pressed.connect(func():
+		if selected_card >= 0:
+			game.request_transfer(selected_card)
+		else:
+			_set_status("Выберите карту для перевода.")
+	)
+	actions.add_child(transfer_btn)
 	root_box.add_child(actions)
 	_render_state(current_state)
 	_render_hand()
