@@ -133,13 +133,34 @@ jobs:
             exit 1
           fi
 
+      - name: Validate Android export prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Godot version:"
+          "${GODOT_BIN}" --version
+          echo "Android SDK: ${ANDROID_HOME}"
+          test -d "${ANDROID_HOME}/platforms/android-${ANDROID_API_LEVEL}" || { echo "::error::Android platform android-${ANDROID_API_LEVEL} is missing"; exit 1; }
+          test -d "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}" || { echo "::error::Android build tools ${ANDROID_BUILD_TOOLS} are missing"; exit 1; }
+          test -s "${GODOT_DEBUG_KEYSTORE}" || { echo "::error::Debug keystore is missing"; exit 1; }
+          TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          test -s "${TEMPLATE_DIR}/android_debug.apk" || { echo "::error::Godot Android debug export template is missing"; find "${TEMPLATE_DIR}" -maxdepth 1 -type f -printf '%f\\n' || true; exit 1; }
+          echo "Android export prerequisites look present."
+
       - name: Export debug APK
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p build
-          "${GODOT_BIN}" --headless --path . \
-            --export-debug "Android" "build/durak-lan-debug.apk"
+          set +e
+          "${GODOT_BIN}" --headless --path . --verbose --export-debug "Android" "build/durak-lan-debug.apk" 2>&1 | tee /tmp/godot-export.log
+          export_status=${PIPESTATUS[0]}
+          set -e
+          if [ "${export_status}" -ne 0 ]; then
+            echo "::error::Godot Android export failed (exit ${export_status}). Diagnostic messages:"
+            grep -Ei 'error|invalid|missing|required|android|keystore|template|sdk|failed' /tmp/godot-export.log | tail -n 120 || true
+            exit "${export_status}"
+          fi
           test -s "build/durak-lan-debug.apk"
 
       - name: Upload APK artifact
