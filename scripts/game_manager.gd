@@ -155,7 +155,7 @@ func _handle_take(sender: int) -> void:
 			hand.append(pair.defense)
 	table_pairs.clear()
 	_draw_cards()
-	attacker = _next_active_player(attacker)
+	attacker = _next_active_player(defender)
 	defender = _next_active_player(attacker)
 	current_attacker = attacker
 	status_text = "Защитник забрал карты. Ход следующего игрока."
