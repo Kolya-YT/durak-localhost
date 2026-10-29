@@ -71,7 +71,6 @@ func _send_announcement() -> void:
 		"port": _host_port,
 		"players": 1,
 		"capacity": 4,
-		"capacity": 4,
 		"timestamp": Time.get_ticks_msec()
 	}
 	var bytes := JSON.stringify(packet).to_utf8_buffer()
@@ -97,6 +96,7 @@ func _receive_announcements() -> void:
 			"ip": sender_ip,
 			"port": int(parsed.get("port", 39178)),
 			"players": int(parsed.get("players", 1)),
+			"capacity": int(parsed.get("capacity", 4)),
 			"last_seen": Time.get_ticks_msec()
 		}
 		_rooms[code] = room
