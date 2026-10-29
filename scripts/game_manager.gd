@@ -98,6 +98,42 @@ func _handle_play(sender: int, card_index: int, target_pair: int) -> void:
 		status_text = "Подкинута карта."
 	_publish_state()
 
+func request_transfer(card_index: int) -> void:
+	if multiplayer.is_server():
+		_handle_transfer(multiplayer.get_unique_id(), card_index)
+	else:
+		_request_transfer.rpc_id(1, card_index)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_transfer(card_index: int) -> void:
+	if multiplayer.is_server():
+		_handle_transfer(multiplayer.get_remote_sender_id(), card_index)
+
+func _handle_transfer(sender: int, card_index: int) -> void:
+	if not game_started or round_finished or sender != defender or player_order.size() < 3:
+		return
+	if table_pairs.size() != 1 or not (table_pairs[0].defense as Dictionary).is_empty():
+		return
+	var hand: Array = hands.get(sender, [])
+	if card_index < 0 or card_index >= hand.size():
+		return
+	var card: Dictionary = hand[card_index]
+	if int(card.rank) != int(table_pairs[0].attack.rank):
+		status_text = "Для перевода нужна карта того же достоинства."
+		notice_changed.emit(status_text)
+		return
+	var next_defender := _next_player(defender)
+	if next_defender == attacker or int((hands.get(next_defender, []) as Array).size()) < table_pairs.size() + 1:
+		status_text = "Следующему игроку не хватает карт для перевода."
+		notice_changed.emit(status_text)
+		return
+	hand.remove_at(card_index)
+	table_pairs.append({"attack": card, "defense": {}})
+	defender = next_defender
+	current_attacker = attacker
+	status_text = "Перевод выполнен. Защищается следующий игрок."
+	_publish_state()
+
 func request_take() -> void:
 	if multiplayer.is_server():
 		_handle_take(multiplayer.get_unique_id())
