@@ -57,7 +57,10 @@ jobs:
           sdkmanager --install \
             "platform-tools" \
             "platforms;android-${ANDROID_API_LEVEL}" \
-            "build-tools;${ANDROID_BUILD_TOOLS}"
+            "build-tools;${ANDROID_BUILD_TOOLS}" \
+            "cmdline-tools;latest" \
+            "cmake;3.10.2.4988404" \
+            "ndk;23.2.8568313"
           yes | sdkmanager --licenses >/dev/null || true
 
       - name: Download Godot headless executable and Android export templates
@@ -142,6 +145,11 @@ jobs:
           echo "Godot version:"
           "${GODOT_BIN}" --version
           echo "Android SDK: ${ANDROID_HOME}"
+          echo "Android SDK packages:"
+          find "${ANDROID_HOME}/ndk" -mindepth 1 -maxdepth 1 -type d -printf '%f\\n' 2>/dev/null || true
+          find "${ANDROID_HOME}/cmake" -mindepth 1 -maxdepth 1 -type d -printf '%f\\n' 2>/dev/null || true
+          test -d "${ANDROID_HOME}/ndk/23.2.8568313" || { echo "::error::Android NDK 23.2.8568313 is missing"; exit 1; }
+          test -d "${ANDROID_HOME}/cmake/3.10.2.4988404" || { echo "::error::Android CMake 3.10.2.4988404 is missing"; exit 1; }
           test -d "${ANDROID_HOME}/platforms/android-${ANDROID_API_LEVEL}" || { echo "::error::Android platform android-${ANDROID_API_LEVEL} is missing"; exit 1; }
           test -d "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}" || { echo "::error::Android build tools ${ANDROID_BUILD_TOOLS} are missing"; exit 1; }
           test -s "${GODOT_DEBUG_KEYSTORE}" || { echo "::error::Debug keystore is missing"; exit 1; }
