@@ -33,3 +33,5 @@ theme/default_font_multichannel_signed_distance_field=true
 [network]
 
 limits/debugger/max_chars_per_second=4096
+
+rendering/textures/vram_compression/import_etc2_astc=true
