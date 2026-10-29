@@ -14,7 +14,7 @@ var table_box: HBoxContainer
 var status_label: Label
 var players_label: Label
 var selected_card := -1
-var local_hand: Array[Dictionary] = []
+var local_hand: Array = []
 var current_state: Dictionary = {}
 var name_input: LineEdit
 var _refresh_timer := 0.0
@@ -225,7 +225,7 @@ func _on_peers_changed(ids: Array[int]) -> void:
 	if network.is_host and discovery:
 		discovery.set_hosting(true, "Дурак LAN", NETWORK_SCRIPT.GAME_PORT)
 
-func _on_hand_changed(cards: Array[Dictionary]) -> void:
+func _on_hand_changed(cards: Array) -> void:
 	local_hand = cards.duplicate(true)
 	selected_card = -1
 	_render_hand()
