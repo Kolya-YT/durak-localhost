@@ -10,7 +10,6 @@ config/description="Локальная карточная игра Дурак д
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/version="0.1.0"
-config/明=""
 
 [display]
 
