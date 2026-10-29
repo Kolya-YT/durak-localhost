@@ -10,6 +10,7 @@ on:
       - "**.tres"
       - "project.godot"
       - "export_presets.cfg"
+      - "assets/**"
       - ".github/workflows/build_apk.yml"
   pull_request:
     branches:
@@ -69,7 +70,11 @@ jobs:
             "${GODOT_BASE}/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" \
             --output /tmp/godot.zip
           unzip -q /tmp/godot.zip -d "${GODOT_HOME}/bin"
-          GODOT_BIN="$(find "${GODOT_HOME}/bin" -type f -name 'Godot_v*-linux.x86_64' -print -quit)"
+          # Official Godot Linux archives use "_linux.x86_64" (underscore), not "-linux.x86_64".
+          GODOT_BIN="$(find "${GODOT_HOME}/bin" -type f -name 'Godot_v*-stable_linux.x86_64' -print -quit)"
+          if [ -z "${GODOT_BIN}" ]; then
+            GODOT_BIN="$(find "${GODOT_HOME}/bin" -type f -name 'Godot_v*linux.x86_64' -print -quit)"
+          fi
           if [ -z "${GODOT_BIN}" ]; then
             echo "Godot executable was not found in the downloaded archive." >&2
             exit 1
