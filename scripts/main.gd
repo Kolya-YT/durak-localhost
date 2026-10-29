@@ -188,7 +188,7 @@ func _show_table() -> void:
 func _on_host_pressed() -> void:
 	var err := network.create_room(name_input.text)
 	if err == OK:
-		discovery.advertise_room("Дурак LAN", "room-%d" % get_instance_id(), NETWORK_SCRIPT.GAME_PORT)
+		discovery.advertise_room("Дурак LAN", "room-%d" % OS.get_process_id(), NETWORK_SCRIPT.GAME_PORT)
 		_show_room()
 
 func _on_rooms_changed(rooms: Array[Dictionary]) -> void:
@@ -203,7 +203,7 @@ func _on_rooms_changed(rooms: Array[Dictionary]) -> void:
 		return
 	for room in rooms:
 		var button := Button.new()
-		button.text = "%s · %d/%d\n%s:%d" % [room.name, room.players, room.capacity, room.ip, room.port]
+		button.text = "%s · %d/%d\n%s:%d" % [str(room.get("name", "Комната")), int(room.get("players", 1)), int(room.get("capacity", 4)), str(room.get("ip", "")), int(room.get("port", NETWORK_SCRIPT.GAME_PORT))]
 		button.custom_minimum_size.y = 64
 		var ip := str(room.ip)
 		var port := int(room.port)
