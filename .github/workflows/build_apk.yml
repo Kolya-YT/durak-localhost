@@ -88,6 +88,8 @@ jobs:
           TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           mkdir -p "${TEMPLATE_DIR}"
           cp -a "${GODOT_HOME}/templates/templates/." "${TEMPLATE_DIR}/"
+          echo "Installed Godot export template files:"
+          find "${TEMPLATE_DIR}" -maxdepth 2 -type f -printf '%P (%s bytes)\\n' | sort
           "${GODOT_BIN}" --version
 
       - name: Configure Android SDK paths for Godot
@@ -144,7 +146,9 @@ jobs:
           test -d "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}" || { echo "::error::Android build tools ${ANDROID_BUILD_TOOLS} are missing"; exit 1; }
           test -s "${GODOT_DEBUG_KEYSTORE}" || { echo "::error::Debug keystore is missing"; exit 1; }
           TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-          test -s "${TEMPLATE_DIR}/android_debug.apk" || { echo "::error::Godot Android debug export template is missing"; find "${TEMPLATE_DIR}" -maxdepth 1 -type f -printf '%f\\n' || true; exit 1; }
+          test -s "${TEMPLATE_DIR}/android_debug.apk" || { echo "::error::Godot Android debug export template android_debug.apk is missing"; find "${TEMPLATE_DIR}" -maxdepth 2 -type f -printf '%P\\n' || true; exit 1; }
+          test -s "${TEMPLATE_DIR}/android_release.apk" || { echo "::error::Godot Android release export template android_release.apk is missing"; find "${TEMPLATE_DIR}" -maxdepth 2 -type f -printf '%P\\n' || true; exit 1; }
+          test -s "${TEMPLATE_DIR}/version.txt" || { echo "::error::Godot export template version.txt is missing"; find "${TEMPLATE_DIR}" -maxdepth 2 -type f -printf '%P\\n' || true; exit 1; }
           echo "Android export prerequisites look present."
 
       - name: Export debug APK
