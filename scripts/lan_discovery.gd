@@ -71,6 +71,7 @@ func _send_announcement() -> void:
 		"port": _host_port,
 		"players": 1,
 		"capacity": 4,
+		"capacity": 4,
 		"timestamp": Time.get_ticks_msec()
 	}
 	var bytes := JSON.stringify(packet).to_utf8_buffer()
